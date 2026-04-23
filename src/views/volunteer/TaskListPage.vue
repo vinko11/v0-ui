@@ -52,6 +52,21 @@ const tasks = ref<Task[]>([
   }
 ])
 
+// 志愿者荣誉信息
+const volunteerStats = ref({
+  rank: '银星志愿者',
+  totalHours: 156,
+  completedTasks: 45,
+  rating: 4.9
+})
+
+// 培训中心
+const trainingItems = ref([
+  { id: '1', title: '轮椅使用指南', icon: '🦽' },
+  { id: '2', title: '急救基础知识', icon: '🏥' },
+  { id: '3', title: '沟通技巧培训', icon: '💬' }
+])
+
 // 拒绝弹窗
 const showRejectModal = ref(false)
 const rejectingTaskId = ref<string | null>(null)
@@ -95,19 +110,75 @@ const startTask = (taskId: string) => {
 const goToRegister = () => {
   router.push('/volunteer/register')
 }
+
+const goToProfile = () => {
+  router.push('/volunteer/profile')
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-background pb-24">
     <!-- 顶部导航 -->
     <header class="bg-primary text-primary-foreground px-4 py-5">
-      <h1 class="text-2xl font-bold text-center">待办任务</h1>
+      <h1 class="text-2xl font-bold text-center">志愿者中心</h1>
+      
+      <!-- 信任徽章 -->
+      <div class="flex justify-center gap-2 mt-3">
+        <span class="trust-badge bg-white/20 text-white text-sm">
+          ⭐ {{ volunteerStats.rank }}
+        </span>
+        <span class="trust-badge bg-white/20 text-white text-sm">
+          ✓ 认证志愿者
+        </span>
+      </div>
     </header>
 
     <!-- 移动端框架容器 -->
     <div class="max-w-md mx-auto">
+      <!-- 荣誉墙 -->
+      <div class="bg-gradient-to-r from-primary/10 to-warning/10 mx-5 mt-5 rounded-xl p-5 border border-primary/20">
+        <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          🏆 志愿者荣誉
+        </h3>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-primary">{{ volunteerStats.totalHours }}</p>
+            <p class="text-xs text-muted-foreground mt-1">服务时长</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-success">{{ volunteerStats.completedTasks }}</p>
+            <p class="text-xs text-muted-foreground mt-1">完成任务</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-warning">{{ volunteerStats.rating }}</p>
+            <p class="text-xs text-muted-foreground mt-1">服务评分</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl">⭐</p>
+            <p class="text-xs text-muted-foreground mt-1">银星</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 培训中心入口 -->
+      <div class="bg-card mx-5 mt-4 rounded-xl p-4 border border-border">
+        <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+          📚 培训中心
+        </h3>
+        <div class="flex gap-3 overflow-x-auto pb-2">
+          <button
+            v-for="item in trainingItems"
+            :key="item.id"
+            class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-secondary rounded-lg text-sm font-medium text-secondary-foreground"
+          >
+            <span>{{ item.icon }}</span>
+            <span>{{ item.title }}</span>
+          </button>
+        </div>
+      </div>
+
       <!-- 统计信息 -->
-      <div class="bg-card mx-5 mt-5 rounded-xl p-5 border border-border">
+      <div class="bg-card mx-5 mt-4 rounded-xl p-5 border border-border">
         <div class="flex justify-around">
           <div class="text-center">
             <p class="text-3xl font-bold text-primary">{{ tasks.filter(t => t.status === 'accepted').length }}</p>
@@ -123,6 +194,7 @@ const goToRegister = () => {
 
       <!-- 任务列表 -->
       <main class="p-5">
+        <h2 class="text-xl font-bold text-foreground mb-4">待办任务</h2>
         <div class="flex flex-col gap-4">
           <div
             v-for="task in tasks.filter(t => t.status !== 'rejected')"
@@ -130,7 +202,7 @@ const goToRegister = () => {
             class="bg-card rounded-xl p-5 border border-border"
           >
             <!-- 任务头部 -->
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
                 <span class="text-2xl">{{ task.typeIcon }}</span>
                 <span class="text-xl font-bold text-foreground">{{ task.serviceType }}</span>
@@ -148,20 +220,20 @@ const goToRegister = () => {
             </div>
 
             <!-- 任务描述 -->
-            <p class="text-lg text-foreground mb-4 line-clamp-2">{{ task.description }}</p>
+            <p class="text-lg text-foreground mb-3 line-clamp-2">{{ task.description }}</p>
 
             <!-- 任务信息 -->
             <div class="flex flex-col gap-2 mb-4 text-muted-foreground">
-              <div class="flex items-center gap-2 text-lg">
+              <div class="flex items-center gap-2 text-base">
                 <span>📍</span>
                 <span>{{ task.address }}</span>
                 <span class="ml-auto font-semibold text-primary">{{ task.distance }}</span>
               </div>
-              <div class="flex items-center gap-2 text-lg">
+              <div class="flex items-center gap-2 text-base">
                 <span>🕐</span>
                 <span>{{ task.time }}</span>
               </div>
-              <div class="flex items-center gap-2 text-lg">
+              <div class="flex items-center gap-2 text-base">
                 <span>👤</span>
                 <span>{{ task.contactName }}</span>
               </div>
@@ -212,6 +284,13 @@ const goToRegister = () => {
           >
             <span class="text-2xl">📝</span>
             <span class="text-base">注册</span>
+          </button>
+          <button 
+            @click="goToProfile"
+            class="flex flex-col items-center text-muted-foreground"
+          >
+            <span class="text-2xl">👤</span>
+            <span class="text-base">档案</span>
           </button>
         </div>
       </nav>

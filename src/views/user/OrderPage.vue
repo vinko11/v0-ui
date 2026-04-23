@@ -26,6 +26,15 @@ const form = ref({
   remark: ''
 })
 
+// 偏好选择
+const preferences = ref({
+  language: '',
+  personality: ''
+})
+
+const languageOptions = ['普通话', '本地方言', '无偏好']
+const personalityOptions = ['温和稳重', '活泼健谈', '无偏好']
+
 const agreedToTerms = ref(false)
 
 const isFormValid = computed(() => {
@@ -68,9 +77,20 @@ const goBack = () => {
 
     <!-- 移动端框架容器 -->
     <div class="max-w-md mx-auto">
+      <!-- 安全保障提示 -->
+      <div class="mx-5 mt-4 bg-trust/10 rounded-xl p-4 border border-trust/20">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🛡️</span>
+          <div>
+            <p class="text-base font-semibold text-foreground">服务安全保障</p>
+            <p class="text-sm text-muted-foreground">所有服务均有记录并受社区监督</p>
+          </div>
+        </div>
+      </div>
+
       <!-- 表单区域 -->
       <main class="p-5">
-        <form @submit.prevent="submitOrder" class="flex flex-col gap-6">
+        <form @submit.prevent="submitOrder" class="flex flex-col gap-5">
           
           <!-- 日期选择 -->
           <div class="flex flex-col gap-2">
@@ -140,6 +160,55 @@ const goBack = () => {
             />
           </div>
 
+          <!-- 偏好选择 -->
+          <div class="bg-secondary rounded-xl p-4">
+            <p class="text-lg font-semibold text-foreground mb-3">志愿者偏好（可选）</p>
+            
+            <div class="flex flex-col gap-4">
+              <div>
+                <p class="text-base text-muted-foreground mb-2">语言偏好</p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-for="lang in languageOptions"
+                    :key="lang"
+                    type="button"
+                    @click="preferences.language = lang"
+                    :disabled="isUserFrozen"
+                    :class="[
+                      'px-4 py-2 rounded-lg text-base font-medium transition-all',
+                      preferences.language === lang
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-foreground border border-border'
+                    ]"
+                  >
+                    {{ lang }}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <p class="text-base text-muted-foreground mb-2">性格偏好</p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-for="p in personalityOptions"
+                    :key="p"
+                    type="button"
+                    @click="preferences.personality = p"
+                    :disabled="isUserFrozen"
+                    :class="[
+                      'px-4 py-2 rounded-lg text-base font-medium transition-all',
+                      preferences.personality === p
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-foreground border border-border'
+                    ]"
+                  >
+                    {{ p }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 备注 -->
           <div class="flex flex-col gap-2">
             <label class="text-xl font-semibold text-foreground">
@@ -155,7 +224,7 @@ const goBack = () => {
           </div>
 
           <!-- 免责协议 -->
-          <div class="bg-secondary rounded-xl p-5">
+          <div class="bg-card rounded-xl p-4 border border-border">
             <label class="flex items-start gap-4 cursor-pointer">
               <input
                 v-model="agreedToTerms"
@@ -163,7 +232,7 @@ const goBack = () => {
                 :disabled="isUserFrozen"
                 class="w-7 h-7 mt-1 accent-primary rounded shrink-0 disabled:opacity-50"
               />
-              <span class="text-lg text-secondary-foreground leading-relaxed">
+              <span class="text-lg text-foreground leading-relaxed">
                 我已阅读并同意《暖心相伴服务协议》及《免责声明》，了解服务性质为志愿互助，非商业行为。
               </span>
             </label>

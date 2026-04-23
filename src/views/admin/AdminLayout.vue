@@ -12,9 +12,11 @@ interface MenuItem {
 }
 
 const menuItems = ref<MenuItem[]>([
+  { path: '/admin/dashboard', label: '数据概览', icon: '📊' },
   { path: '/admin/review', label: '志愿者审核', icon: '👥' },
   { path: '/admin/orders', label: '订单管理', icon: '📋' },
-  { path: '/admin/users', label: '用户管理', icon: '👤' }
+  { path: '/admin/users', label: '用户管理', icon: '👤' },
+  { path: '/admin/audit', label: '审计日志', icon: '📝' }
 ])
 
 const currentPath = computed(() => route.path)
@@ -53,6 +55,19 @@ const navigateTo = (path: string) => {
           </li>
         </ul>
       </nav>
+
+      <!-- 管理员信息 -->
+      <div class="p-4 border-t border-border">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            👤
+          </div>
+          <div>
+            <p class="text-base font-medium text-foreground">管理员</p>
+            <p class="text-sm text-muted-foreground">admin@example.com</p>
+          </div>
+        </div>
+      </div>
     </aside>
 
     <!-- 主内容区 -->
