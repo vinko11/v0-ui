@@ -41,6 +41,38 @@ const services = ref<Service[]>([
   }
 ])
 
+// 服务套餐
+interface Bundle {
+  id: string
+  title: string
+  services: string[]
+  discount: string
+  price: string
+  originalPrice: string
+  popular: boolean
+}
+
+const bundles = ref<Bundle[]>([
+  {
+    id: 'bundle1',
+    title: '医院购物套餐',
+    services: ['就医陪同', '购物协助'],
+    discount: '省 ¥30',
+    price: '¥150',
+    originalPrice: '¥180',
+    popular: true
+  },
+  {
+    id: 'bundle2',
+    title: '全能关怀套餐',
+    services: ['陪聊服务', '就医陪同', '购物协助'],
+    discount: '省 ¥50',
+    price: '¥220',
+    originalPrice: '¥270',
+    popular: false
+  }
+])
+
 // 社区统计数据
 const stats = ref({
   hoursVolunteered: 1240,
@@ -72,6 +104,14 @@ const selectService = (serviceId: string) => {
   router.push({ path: '/order', query: { type: serviceId } })
 }
 
+const selectBundle = (bundleId: string) => {
+  router.push({ path: '/order', query: { bundle: bundleId } })
+}
+
+const goToVolunteerList = () => {
+  router.push('/volunteers')
+}
+
 const goToProfile = () => {
   router.push('/profile')
 }
@@ -97,16 +137,16 @@ const goToProfile = () => {
           <span>✓</span> 实名认证
         </span>
         <span class="trust-badge bg-white/20 text-white">
-          <span>🛡️</span> 社区认证
+          <span class="text-sm">🛡️</span> 社区认证
         </span>
         <span class="trust-badge bg-white/20 text-white">
-          <span>⭐</span> 服务保障
+          <span class="text-sm">⭐</span> 服务保障
         </span>
       </div>
     </header>
 
     <!-- 移动端框架容器 -->
-    <div class="max-w-md mx-auto">
+    <div class="max-w-md mx-auto pb-24">
       
       <!-- 社区公告滚动条 -->
       <div class="bg-secondary mx-5 mt-4 rounded-xl px-4 py-3 overflow-hidden">
@@ -139,9 +179,52 @@ const goToProfile = () => {
         </div>
       </div>
 
-      <!-- 服务卡片区域 -->
+      <!-- 服务套餐 -->
       <main class="p-5">
-        <h2 class="text-2xl font-semibold mb-5 text-foreground">选择服务</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-semibold text-foreground">服务套餐</h2>
+          <span class="text-sm text-primary font-medium">更优惠</span>
+        </div>
+        
+        <div class="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5">
+          <button
+            v-for="bundle in bundles"
+            :key="bundle.id"
+            @click="selectBundle(bundle.id)"
+            :disabled="isUserFrozen"
+            :class="[
+              'flex-shrink-0 w-48 p-4 rounded-xl border-2 bg-card text-left transition-all relative',
+              isUserFrozen 
+                ? 'opacity-50 cursor-not-allowed border-border' 
+                : 'active:scale-[0.98] hover:border-primary border-border hover:shadow-md'
+            ]"
+          >
+            <span 
+              v-if="bundle.popular"
+              class="absolute -top-2 -right-2 bg-warning text-warning-foreground text-xs px-2 py-1 rounded-full font-bold"
+            >
+              热门
+            </span>
+            <h3 class="text-lg font-bold text-foreground">{{ bundle.title }}</h3>
+            <div class="flex flex-wrap gap-1 mt-2">
+              <span 
+                v-for="service in bundle.services" 
+                :key="service"
+                class="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded"
+              >
+                {{ service }}
+              </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-xl font-bold text-primary">{{ bundle.price }}</span>
+              <span class="text-sm text-muted-foreground line-through">{{ bundle.originalPrice }}</span>
+            </div>
+            <span class="text-xs text-success font-medium">{{ bundle.discount }}</span>
+          </button>
+        </div>
+
+        <!-- 单项服务 -->
+        <h2 class="text-2xl font-semibold mb-4 text-foreground mt-6">选择服务</h2>
         
         <div class="flex flex-col gap-4">
           <button
@@ -185,6 +268,21 @@ const goToProfile = () => {
           </button>
         </div>
 
+        <!-- 查看志愿者入口 -->
+        <button
+          @click="goToVolunteerList"
+          class="w-full mt-6 p-4 bg-secondary rounded-xl flex items-center justify-between active:scale-[0.98]"
+        >
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">👥</span>
+            <div class="text-left">
+              <p class="text-lg font-semibold text-foreground">查看志愿者</p>
+              <p class="text-sm text-muted-foreground">浏览志愿者档案和评价</p>
+            </div>
+          </div>
+          <span class="text-muted-foreground">→</span>
+        </button>
+
         <!-- 信任保障说明 -->
         <div class="mt-6 p-4 bg-trust/10 rounded-xl border border-trust/20">
           <div class="flex items-center gap-3 mb-3">
@@ -211,6 +309,13 @@ const goToProfile = () => {
           <button class="flex flex-col items-center text-primary">
             <span class="text-2xl">🏠</span>
             <span class="text-base font-medium">首页</span>
+          </button>
+          <button 
+            @click="goToVolunteerList"
+            class="flex flex-col items-center text-muted-foreground"
+          >
+            <span class="text-2xl">👥</span>
+            <span class="text-base">志愿者</span>
           </button>
           <button 
             @click="router.push('/order/1')"
