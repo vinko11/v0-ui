@@ -9,6 +9,7 @@ interface Volunteer {
   community: string
   submitDate: string
   status: 'pending' | 'approved' | 'rejected'
+  rejectReason?: string
 }
 
 const volunteers = ref<Volunteer[]>([
@@ -46,9 +47,16 @@ const volunteers = ref<Volunteer[]>([
     idCard: '110***********3456',
     community: '东城区AA社区',
     submitDate: '2024-04-18',
-    status: 'rejected'
+    status: 'rejected',
+    rejectReason: '身份信息不完整'
   }
 ])
+
+// 拒绝弹窗
+const showRejectModal = ref(false)
+const rejectingId = ref<string | null>(null)
+const rejectReason = ref('')
+const rejectError = ref('')
 
 const approveVolunteer = (id: string) => {
   const volunteer = volunteers.value.find(v => v.id === id)
@@ -57,11 +65,28 @@ const approveVolunteer = (id: string) => {
   }
 }
 
-const rejectVolunteer = (id: string) => {
-  const volunteer = volunteers.value.find(v => v.id === id)
+const openRejectModal = (id: string) => {
+  rejectingId.value = id
+  rejectReason.value = ''
+  rejectError.value = ''
+  showRejectModal.value = true
+}
+
+const confirmReject = () => {
+  if (rejectReason.value.length < 5) {
+    rejectError.value = '拒绝原因至少需要5个字符'
+    return
+  }
+  
+  const volunteer = volunteers.value.find(v => v.id === rejectingId.value)
   if (volunteer) {
     volunteer.status = 'rejected'
+    volunteer.rejectReason = rejectReason.value
   }
+  
+  showRejectModal.value = false
+  rejectingId.value = null
+  rejectReason.value = ''
 }
 
 const getStatusClass = (status: string) => {
@@ -153,6 +178,9 @@ const getStatusLabel = (status: string) => {
               >
                 {{ getStatusLabel(volunteer.status) }}
               </span>
+              <p v-if="volunteer.rejectReason" class="text-sm text-destructive mt-1">
+                原因：{{ volunteer.rejectReason }}
+              </p>
             </td>
             <td class="px-6 py-5">
               <div v-if="volunteer.status === 'pending'" class="flex gap-3">
@@ -163,7 +191,7 @@ const getStatusLabel = (status: string) => {
                   通过
                 </button>
                 <button
-                  @click="rejectVolunteer(volunteer.id)"
+                  @click="openRejectModal(volunteer.id)"
                   class="px-5 py-2 bg-destructive text-destructive-foreground rounded-lg text-base font-medium hover:opacity-90 transition-opacity"
                 >
                   拒绝
@@ -174,6 +202,41 @@ const getStatusLabel = (status: string) => {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- 拒绝原因弹窗 -->
+    <div
+      v-if="showRejectModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-card rounded-2xl p-6 w-full max-w-md">
+        <h3 class="text-2xl font-bold text-foreground mb-4">拒绝原因</h3>
+        <p class="text-lg text-muted-foreground mb-4">请说明拒绝此申请的原因（至少5个字符）</p>
+        
+        <textarea
+          v-model="rejectReason"
+          rows="3"
+          placeholder="请输入拒绝原因..."
+          class="w-full p-4 text-lg border-2 border-border rounded-xl bg-background focus:border-primary focus:outline-none placeholder:text-muted-foreground resize-none"
+        ></textarea>
+        
+        <p v-if="rejectError" class="text-destructive mt-2 text-base">{{ rejectError }}</p>
+        
+        <div class="flex gap-3 mt-6">
+          <button
+            @click="showRejectModal = false"
+            class="flex-1 py-3 text-lg font-semibold rounded-xl bg-secondary text-secondary-foreground"
+          >
+            取消
+          </button>
+          <button
+            @click="confirmReject"
+            class="flex-1 py-3 text-lg font-semibold rounded-xl bg-destructive text-destructive-foreground"
+          >
+            确认拒绝
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -11,11 +11,13 @@ import UserOrderDetail from './views/user/OrderDetailPage.vue'
 // 志愿者端页面
 import VolunteerTasks from './views/volunteer/TaskListPage.vue'
 import VolunteerExecute from './views/volunteer/ExecutePage.vue'
+import VolunteerRegister from './views/volunteer/RegisterPage.vue'
 
 // 管理后台页面
 import AdminLayout from './views/admin/AdminLayout.vue'
 import AdminReview from './views/admin/ReviewPage.vue'
 import AdminOrders from './views/admin/OrdersPage.vue'
+import AdminUsers from './views/admin/UsersPage.vue'
 
 const routes = [
   // 用户端路由
@@ -26,6 +28,7 @@ const routes = [
   // 志愿者端路由
   { path: '/volunteer', component: VolunteerTasks, meta: { title: '待办任务 - 暖心相伴' } },
   { path: '/volunteer/execute/:id', component: VolunteerExecute, meta: { title: '执行任务 - 暖心相伴' } },
+  { path: '/volunteer/register', component: VolunteerRegister, meta: { title: '志愿者注册 - 暖心相伴' } },
   
   // 管理后台路由
   {
@@ -34,7 +37,8 @@ const routes = [
     children: [
       { path: '', redirect: '/admin/review' },
       { path: 'review', component: AdminReview, meta: { title: '志愿者审核 - 管理后台' } },
-      { path: 'orders', component: AdminOrders, meta: { title: '订单管理 - 管理后台' } }
+      { path: 'orders', component: AdminOrders, meta: { title: '订单管理 - 管理后台' } },
+      { path: 'users', component: AdminUsers, meta: { title: '用户管理 - 管理后台' } }
     ]
   }
 ]

@@ -13,17 +13,14 @@ interface MenuItem {
 
 const menuItems = ref<MenuItem[]>([
   { path: '/admin/review', label: '志愿者审核', icon: '👥' },
-  { path: '/admin/orders', label: '订单管理', icon: '📋' }
+  { path: '/admin/orders', label: '订单管理', icon: '📋' },
+  { path: '/admin/users', label: '用户管理', icon: '👤' }
 ])
 
 const currentPath = computed(() => route.path)
 
 const navigateTo = (path: string) => {
   router.push(path)
-}
-
-const goHome = () => {
-  router.push('/')
 }
 </script>
 
@@ -56,17 +53,6 @@ const goHome = () => {
           </li>
         </ul>
       </nav>
-
-      <!-- 底部返回按钮 -->
-      <div class="p-4 border-t border-border">
-        <button
-          @click="goHome"
-          class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-lg text-muted-foreground hover:bg-secondary transition-all"
-        >
-          <span class="text-xl">🏠</span>
-          <span>返回首页</span>
-        </button>
-      </div>
     </aside>
 
     <!-- 主内容区 -->
