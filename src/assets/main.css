@@ -5,7 +5,7 @@
   --foreground: #1a1a1a;
   --card: #ffffff;
   --card-foreground: #1a1a1a;
-  --primary: #E86F2C;
+  --primary: #FF9248;
   --primary-foreground: #ffffff;
   --secondary: #FFF0E5;
   --secondary-foreground: #E86F2C;
@@ -16,8 +16,8 @@
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e5e5e5;
-  --ring: #E86F2C;
-  --radius: 1rem;
+  --ring: #FF9248;
+  --radius: 2rem;
   --success: #22c55e;
   --success-foreground: #ffffff;
   --warning: #f59e0b;
@@ -50,10 +50,10 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-trust: var(--trust);
   --color-trust-foreground: var(--trust-foreground);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
 }
 
 @layer base {
@@ -66,20 +66,53 @@
   }
 }
 
-/* 大字体适配老人 */
+/* 大字体适配老人 - 高对比度 */
 .text-elder {
   font-size: 1.25rem;
   line-height: 1.75rem;
+  font-weight: 500;
 }
 
 .text-elder-lg {
   font-size: 1.5rem;
   line-height: 2rem;
+  font-weight: 600;
 }
 
 .text-elder-xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
+  font-weight: 700;
+}
+
+/* 大圆角卡片 - 32px+ */
+.card-warm {
+  @apply bg-card rounded-[32px] shadow-sm p-6;
+}
+
+.card-warm-lg {
+  @apply bg-card rounded-[40px] shadow-sm p-8;
+}
+
+/* 大按钮 - 适老化 */
+.btn-elder {
+  @apply px-8 py-5 text-xl font-bold rounded-[24px] transition-all active:scale-95;
+}
+
+.btn-elder-primary {
+  @apply btn-elder bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.btn-elder-secondary {
+  @apply btn-elder bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+.btn-elder-success {
+  @apply btn-elder bg-success text-success-foreground hover:bg-success/90;
+}
+
+.btn-elder-destructive {
+  @apply btn-elder bg-destructive text-destructive-foreground hover:bg-destructive/90;
 }
 
 /* 滚动公告动画 */
@@ -98,5 +131,65 @@
 
 /* 信任徽章样式 */
 .trust-badge {
-  @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium;
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-semibold;
+}
+
+/* Toast 动画 */
+@keyframes toast-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toast-animate {
+  animation: toast-in 0.3s ease-out;
+}
+
+/* 脉冲动画 - 用于进行中状态 */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* 移动端适配 - iPhone 14 尺寸 */
+@media (max-width: 430px) {
+  .card-warm {
+    @apply rounded-[24px] p-4;
+  }
+  
+  .btn-elder {
+    @apply px-6 py-4 text-lg;
+  }
+  
+  .text-elder-xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+/* 底部安全区域 */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* 服务进度线 */
+.progress-line {
+  @apply absolute left-6 top-12 bottom-0 w-1 bg-border;
+}
+
+.progress-line-active {
+  @apply bg-primary;
 }

@@ -1,27 +1,30 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { 
+  LayoutDashboard, 
+  Users, 
+  ClipboardList, 
+  UserCog,
+  FileText,
+  PlusCircle,
+  Settings
+} from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 
-interface MenuItem {
-  path: string
-  label: string
-  icon: string
-}
-
-const menuItems = ref<MenuItem[]>([
-  { path: '/admin/dashboard', label: '数据概览', icon: '📊' },
-  { path: '/admin/review', label: '志愿者审核', icon: '👥' },
-  { path: '/admin/orders', label: '订单管理', icon: '📋' },
-  { path: '/admin/users', label: '用户管理', icon: '👤' },
-  { path: '/admin/audit', label: '审计日志', icon: '📝' }
-])
+const menuItems = [
+  { path: '/admin/dashboard', label: '数据概览', icon: LayoutDashboard },
+  { path: '/admin/review', label: '志愿者审核', icon: Users },
+  { path: '/admin/orders', label: '订单管理', icon: ClipboardList },
+  { path: '/admin/users', label: '用户管理', icon: UserCog },
+  { path: '/admin/audit', label: '审计日志', icon: FileText }
+]
 
 const currentPath = computed(() => route.path)
 
-const navigateTo = (path: string) => {
+function navigateTo(path: string) {
   router.push(path)
 }
 </script>
@@ -29,7 +32,7 @@ const navigateTo = (path: string) => {
 <template>
   <div class="min-h-screen bg-background flex">
     <!-- 侧边栏 -->
-    <aside class="w-64 bg-card border-r border-border flex flex-col shrink-0">
+    <aside class="w-72 bg-card border-r-2 border-border flex flex-col shrink-0">
       <!-- Logo 区域 -->
       <div class="p-6 border-b border-border">
         <h1 class="text-2xl font-bold text-primary">暖心相伴</h1>
@@ -43,28 +46,40 @@ const navigateTo = (path: string) => {
             <button
               @click="navigateTo(item.path)"
               :class="[
-                'w-full flex items-center gap-4 px-4 py-4 rounded-xl text-lg font-medium transition-all',
+                'w-full flex items-center gap-4 px-5 py-4 rounded-[20px] text-lg font-medium transition-all',
                 currentPath === item.path
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-foreground hover:bg-secondary'
               ]"
             >
-              <span class="text-xl">{{ item.icon }}</span>
+              <component :is="item.icon" :size="24" />
               <span>{{ item.label }}</span>
             </button>
           </li>
         </ul>
+
+        <!-- 快捷操作 -->
+        <div class="mt-6 pt-6 border-t border-border">
+          <p class="text-sm text-muted-foreground mb-3 px-2">快捷操作</p>
+          <button 
+            @click="router.push('/admin/orders?action=create')"
+            class="w-full flex items-center gap-4 px-5 py-4 rounded-[20px] text-lg font-medium bg-success/10 text-success hover:bg-success/20 transition-all"
+          >
+            <PlusCircle :size="24" />
+            <span>代下单</span>
+          </button>
+        </div>
       </nav>
 
       <!-- 管理员信息 -->
       <div class="p-4 border-t border-border">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            👤
+        <div class="flex items-center gap-3 p-3 rounded-[16px] bg-secondary/50">
+          <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+            <Settings :size="24" class="text-primary" />
           </div>
           <div>
-            <p class="text-base font-medium text-foreground">管理员</p>
-            <p class="text-sm text-muted-foreground">admin@example.com</p>
+            <p class="text-base font-semibold text-foreground">系统管理员</p>
+            <p class="text-sm text-muted-foreground">admin@nuanxin.com</p>
           </div>
         </div>
       </div>
