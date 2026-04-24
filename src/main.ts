@@ -8,12 +8,16 @@ import UserHome from './views/user/HomePage.vue'
 import UserOrder from './views/user/OrderPage.vue'
 import UserOrderDetail from './views/user/OrderDetailPage.vue'
 import UserProfile from './views/user/ProfilePage.vue'
+import ServiceDetail from './views/user/ServiceDetailPage.vue'
+import VolunteerList from './views/user/VolunteerListPage.vue'
+import VolunteerDetail from './views/user/VolunteerDetailPage.vue'
 
 // 志愿者端页面
 import VolunteerTasks from './views/volunteer/TaskListPage.vue'
 import VolunteerExecute from './views/volunteer/ExecutePage.vue'
 import VolunteerRegister from './views/volunteer/RegisterPage.vue'
 import VolunteerProfile from './views/volunteer/ProfilePage.vue'
+import VolunteerWallet from './views/volunteer/WalletPage.vue'
 
 // 管理后台页面
 import AdminLayout from './views/admin/AdminLayout.vue'
@@ -26,15 +30,20 @@ import AdminAudit from './views/admin/AuditPage.vue'
 const routes = [
   // 用户端路由
   { path: '/', component: UserHome, meta: { title: '首页 - 暖心相伴' } },
+  { path: '/service/:id', component: ServiceDetail, meta: { title: '服务详情 - 暖心相伴' } },
   { path: '/order', component: UserOrder, meta: { title: '下单 - 暖心相伴' } },
   { path: '/order/:id', component: UserOrderDetail, meta: { title: '订单详情 - 暖心相伴' } },
+  { path: '/my-orders', component: UserOrderDetail, meta: { title: '我的订单 - 暖心相伴' } },
   { path: '/profile', component: UserProfile, meta: { title: '我的 - 暖心相伴' } },
+  { path: '/volunteers', component: VolunteerList, meta: { title: '志愿者列表 - 暖心相伴' } },
+  { path: '/volunteers/:id', component: VolunteerDetail, meta: { title: '志愿者详情 - 暖心相伴' } },
   
   // 志愿者端路由
   { path: '/volunteer', component: VolunteerTasks, meta: { title: '待办任务 - 暖心相伴' } },
   { path: '/volunteer/execute/:id', component: VolunteerExecute, meta: { title: '执行任务 - 暖心相伴' } },
   { path: '/volunteer/register', component: VolunteerRegister, meta: { title: '志愿者注册 - 暖心相伴' } },
   { path: '/volunteer/profile', component: VolunteerProfile, meta: { title: '志愿者档案 - 暖心相伴' } },
+  { path: '/volunteer/wallet', component: VolunteerWallet, meta: { title: '我的钱包 - 暖心相伴' } },
   
   // 管理后台路由
   {

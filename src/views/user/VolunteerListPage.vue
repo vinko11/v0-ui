@@ -1,73 +1,64 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useGlobalStore } from '../../store/globalStore'
+import {
+  ArrowLeft,
+  Search,
+  Star,
+  Clock,
+  CheckCircle,
+  Award,
+  ChevronRight,
+  Filter
+} from 'lucide-vue-next'
 
 const router = useRouter()
+const store = useGlobalStore()
 
-interface Volunteer {
-  id: string
-  name: string
-  avatar: string
-  serviceHours: number
-  rating: number
-  completedOrders: number
-  skills: string[]
-  medals: string[]
-  verified: boolean
-}
+// 搜索关键词
+const searchKeyword = ref('')
 
-const volunteers = ref<Volunteer[]>([
-  {
-    id: '1',
-    name: '王阿姨',
-    avatar: '👩',
-    serviceHours: 256,
-    rating: 4.9,
-    completedOrders: 89,
-    skills: ['陪聊', '购物协助'],
-    medals: ['长期服务', '五星好评'],
-    verified: true
-  },
-  {
-    id: '2',
-    name: '李师傅',
-    avatar: '👨',
-    serviceHours: 180,
-    rating: 4.8,
-    completedOrders: 65,
-    skills: ['就医陪同', '购物协助'],
-    medals: ['急救认证', '专业技能'],
-    verified: true
-  },
-  {
-    id: '3',
-    name: '张姐',
-    avatar: '👩',
-    serviceHours: 120,
-    rating: 4.7,
-    completedOrders: 42,
-    skills: ['陪聊', '就医陪同'],
-    medals: ['耐心服务'],
-    verified: true
-  },
-  {
-    id: '4',
-    name: '刘大哥',
-    avatar: '👨',
-    serviceHours: 95,
-    rating: 4.9,
-    completedOrders: 38,
-    skills: ['购物协助', '就医陪同'],
-    medals: ['热心助人'],
-    verified: true
+// 当前筛选技能
+const currentFilter = ref('all')
+
+// 筛选选项
+const filterOptions = [
+  { key: 'all', label: '全部' },
+  { key: '陪聊', label: '陪聊' },
+  { key: '就医陪同', label: '就医' },
+  { key: '购物协助', label: '购物' }
+]
+
+// 已审核的志愿者
+const approvedVolunteers = computed(() => {
+  return store.state.volunteers.filter(v => v.status === 'APPROVED')
+})
+
+// 筛选后的志愿者
+const filteredVolunteers = computed(() => {
+  let list = approvedVolunteers.value
+  
+  // 关键词搜索
+  if (searchKeyword.value) {
+    list = list.filter(v => v.name.includes(searchKeyword.value))
   }
-])
+  
+  // 技能筛选
+  if (currentFilter.value !== 'all') {
+    list = list.filter(v => v.skills.includes(currentFilter.value))
+  }
+  
+  return list
+})
 
-const goToDetail = (id: string) => {
+// 跳转详情
+function goToDetail(id: string) {
   router.push(`/volunteers/${id}`)
 }
 
-const goBack = () => {
+// 返回
+function goBack() {
   router.back()
 }
 </script>
@@ -75,60 +66,76 @@ const goBack = () => {
 <template>
   <div class="min-h-screen bg-background pb-6">
     <!-- 顶部导航 -->
-    <header class="bg-primary text-primary-foreground px-4 py-5 sticky top-0 z-10">
-      <div class="max-w-md mx-auto flex items-center">
-        <button @click="goBack" class="text-2xl mr-4">←</button>
-        <h1 class="text-2xl font-bold flex-1 text-center pr-8">志愿者列表</h1>
+    <header class="bg-[#FF9248] text-white px-4 py-5 sticky top-0 z-10 rounded-b-[2rem]">
+      <div class="max-w-md mx-auto">
+        <div class="flex items-center gap-4 mb-4">
+          <button 
+            @click="goBack" 
+            class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <ArrowLeft :size="24" />
+          </button>
+          <h1 class="text-2xl font-bold flex-1">志愿者列表</h1>
+        </div>
+        
+        <!-- 搜索框 -->
+        <div class="relative">
+          <Search :size="22" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            v-model="searchKeyword"
+            type="text"
+            placeholder="搜索志愿者..."
+            class="w-full pl-12 pr-4 py-4 text-lg rounded-[1.5rem] bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+        </div>
       </div>
     </header>
 
     <!-- 移动端框架容器 -->
     <div class="max-w-md mx-auto">
-      <!-- 搜索和筛选 -->
-      <div class="p-4 bg-card border-b border-border">
-        <div class="flex gap-2">
-          <input
-            type="text"
-            placeholder="搜索志愿者..."
-            class="flex-1 px-4 py-3 text-lg border-2 border-border rounded-xl bg-background focus:border-primary focus:outline-none"
-          />
-          <button class="px-4 py-3 bg-secondary rounded-xl text-lg font-medium">
-            筛选
-          </button>
-        </div>
-        <div class="flex gap-2 mt-3 overflow-x-auto">
-          <button class="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium shrink-0">
-            全部
-          </button>
-          <button class="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium shrink-0">
-            陪聊
-          </button>
-          <button class="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium shrink-0">
-            就医
-          </button>
-          <button class="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium shrink-0">
-            购物
-          </button>
-        </div>
+      <!-- 筛选标签 -->
+      <div class="px-5 py-4 flex gap-3 overflow-x-auto">
+        <button
+          v-for="option in filterOptions"
+          :key="option.key"
+          @click="currentFilter = option.key"
+          :class="[
+            'px-5 py-2.5 rounded-full text-base font-medium shrink-0 transition-all',
+            currentFilter === option.key
+              ? 'bg-[#FF9248] text-white'
+              : 'bg-card text-foreground border border-border'
+          ]"
+        >
+          {{ option.label }}
+        </button>
       </div>
 
       <!-- 志愿者列表 -->
-      <div class="p-4 flex flex-col gap-4">
+      <div class="px-5 flex flex-col gap-4">
+        <!-- 空状态 -->
+        <div
+          v-if="filteredVolunteers.length === 0"
+          class="py-16 text-center"
+        >
+          <div class="empty-state-illustration mx-auto mb-6" />
+          <p class="text-xl text-muted-foreground">暂无符合条件的志愿者</p>
+          <p class="text-base text-muted-foreground mt-2">请尝试其他筛选条件</p>
+        </div>
+
         <button
-          v-for="volunteer in volunteers"
+          v-for="volunteer in filteredVolunteers"
           :key="volunteer.id"
           @click="goToDetail(volunteer.id)"
-          class="w-full bg-card rounded-xl p-4 border border-border text-left active:scale-[0.98] transition-all"
+          class="w-full bg-card rounded-[2rem] p-5 shadow-sm text-left active:scale-[0.98] transition-all"
         >
           <div class="flex items-start gap-4">
             <!-- 头像 -->
-            <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-3xl shrink-0 relative">
-              {{ volunteer.avatar }}
+            <div class="w-16 h-16 rounded-[1.25rem] bg-[#FFF5EE] flex items-center justify-center text-3xl shrink-0 relative">
+              <span>{{ volunteer.name.charAt(0) }}</span>
               <span 
-                v-if="volunteer.verified"
-                class="absolute -bottom-1 -right-1 w-5 h-5 bg-trust text-white rounded-full flex items-center justify-center text-xs"
+                class="absolute -bottom-1 -right-1 w-6 h-6 bg-[#3B82F6] text-white rounded-full flex items-center justify-center"
               >
-                ✓
+                <CheckCircle :size="14" />
               </span>
             </div>
 
@@ -136,42 +143,47 @@ const goBack = () => {
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <h3 class="text-xl font-bold text-foreground">{{ volunteer.name }}</h3>
-                <span class="text-sm text-warning flex items-center gap-0.5">
-                  ⭐ {{ volunteer.rating }}
+                <span class="flex items-center gap-1 text-[#F59E0B] font-medium">
+                  <Star :size="16" fill="currentColor" />
+                  <span>{{ volunteer.rating }}</span>
                 </span>
               </div>
 
               <!-- 服务时长和订单数 -->
-              <div class="flex gap-4 mt-1 text-sm text-muted-foreground">
-                <span>服务 {{ volunteer.serviceHours }} 小时</span>
-                <span>完成 {{ volunteer.completedOrders }} 单</span>
+              <div class="flex gap-4 mt-1.5 text-base text-muted-foreground">
+                <span class="flex items-center gap-1">
+                  <Clock :size="16" />
+                  {{ volunteer.totalHours }} 小时
+                </span>
+                <span>{{ volunteer.serviceCount }} 单</span>
               </div>
 
               <!-- 技能标签 -->
-              <div class="flex flex-wrap gap-1 mt-2">
+              <div class="flex flex-wrap gap-2 mt-2.5">
                 <span
                   v-for="skill in volunteer.skills"
                   :key="skill"
-                  class="px-2 py-0.5 bg-secondary text-secondary-foreground rounded text-xs"
+                  class="px-3 py-1 bg-[#FFF5EE] text-[#FF9248] rounded-full text-sm font-medium"
                 >
                   {{ skill }}
                 </span>
               </div>
 
               <!-- 荣誉勋章 -->
-              <div class="flex flex-wrap gap-1 mt-2">
+              <div class="flex flex-wrap gap-2 mt-2">
                 <span
-                  v-for="medal in volunteer.medals"
-                  :key="medal"
-                  class="px-2 py-0.5 bg-warning/20 text-warning rounded text-xs font-medium"
+                  v-for="badge in volunteer.badges.slice(0, 2)"
+                  :key="badge"
+                  class="flex items-center gap-1 px-2.5 py-1 bg-[#FEF3C7] text-[#D97706] rounded-full text-sm font-medium"
                 >
-                  🏅 {{ medal }}
+                  <Award :size="14" />
+                  {{ badge }}
                 </span>
               </div>
             </div>
 
             <!-- 箭头 -->
-            <span class="text-muted-foreground text-xl shrink-0">→</span>
+            <ChevronRight :size="28" class="text-muted-foreground shrink-0 mt-4" />
           </div>
         </button>
       </div>
